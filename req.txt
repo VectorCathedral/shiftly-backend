@@ -1,4 +1,4 @@
-camelot-py
 psycopg
 dotenv
 fastapi
+uvicorn
