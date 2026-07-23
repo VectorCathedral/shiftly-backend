@@ -16,13 +16,13 @@ class Database:
     self.cursor=self.conn.cursor()
 
 
-    def get_or_add_agent(self,agent_name:str):
+    def get_or_add_agent(self,email:str,agent_name:str):
       self.cursor.execute(
           '''
         SELECT * FROM agents WHERE
-        fullname = %s
+        email = %s and fullname =%s
           ''',
-          (agent_name,)
+          (email,agent_name)
       )
 
       agent=self.cursor.fetchone()
@@ -32,12 +32,11 @@ class Database:
       
       self.cursor.execute(
             '''
-            INSERT INTO agents()
+            INSERT INTO agents(email,fullname)
             VALUES
-            (%s)
-
+            (%s,%s)
             ''',
-            (agent_name,)
+            (email,agent_name)
         )
       agent_id=self.cursor.fetchone()[0]
       self.conn.commit()
