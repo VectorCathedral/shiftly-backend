@@ -1,6 +1,6 @@
+import uvicorn
 from functions import html_parser
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 from fastapi import FastAPI,UploadFile,File,Form
 
 app=FastAPI()
@@ -21,6 +21,11 @@ async def upload(file: UploadFile=File(...),
 
     schedule=html_parser (html)
 
+
+
+
+
+                     
     return {
         "ok":True,
         "email":email,
