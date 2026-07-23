@@ -1,3 +1,4 @@
+import os
 import psycopg
 from dotenv import load_env
 load_env()
@@ -8,7 +9,7 @@ class Database:
         host="localhost",
         dbname="shiftly",
         user="frame",
-        password=get_env("db_pwd"),
+        password=os.get_env("db_pwd"),
         port=5432
     )
     self.cursor=self.conn.cursor()
