@@ -1,5 +1,6 @@
 import uvicorn
 from functions import html_parser
+from database import get_or_add_agent
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI,UploadFile,File,Form
 
@@ -21,7 +22,9 @@ async def upload(file: UploadFile=File(...),
 
     schedule=html_parser (html)
 
-
+    fullname=schedule[0].get ("agent","")
+    get_or_add_agent(email,fullname)
+        
 
 
 
