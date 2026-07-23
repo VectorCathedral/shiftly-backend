@@ -78,9 +78,7 @@ def get_agent(soup):#returns an agents fullname
 
 
 
-def html_parser(html_file):
-  with open(html_file,"r",encoding="utf-8") as fp:
-    html_file=fp.read()
+def html_parser(html_file:str):
 
 
   soup=bs(html_file,"html.parser")
