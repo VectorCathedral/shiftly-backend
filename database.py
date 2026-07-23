@@ -1,7 +1,4 @@
 import psycopg
-from functions import html_parser
-
-html_parser("C:/Users/mothe/shiftly/backend/myschedule (1).html")
 
 
 class Database:
