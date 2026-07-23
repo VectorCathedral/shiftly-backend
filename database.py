@@ -10,7 +10,7 @@ class Database:
         host="localhost",
         dbname="shiftly",
         user="postgres",
-        password="160910",
+        password="*****",
         port=5432
     )
     self.cursor=self.conn.cursor()
