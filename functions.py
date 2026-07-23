@@ -1,6 +1,20 @@
-from datetime import datetime
+from dateutil import parser
+from datetime import datetime as dt
 from bs4 import BeautifulSoup as bs
 
+
+
+
+def valid_time(date_time:str):
+    time,meridiem=date_time.split(" ")
+
+    if "AM" in meridiem:
+        time=parser.parse(time+"AM").time()
+    else:
+        time=parser.parse(time+"PM").time()
+    return time
+
+ 
 def get_schedule(rows,fname,lname):
   schedule=[]
 
@@ -45,7 +59,7 @@ def get_schedule(rows,fname,lname):
 
 
         date_str=f"{int(shift_[2].strip(","))}-{months[shift_[1]]}-{shift_[3]}"
-        data["date"]=date_str
+        data["date"]=dt.strptime(date_str,"%d-%m-%Y")
 
       #appending time and agent fullname to dict
       for time in shift_times:
@@ -53,15 +67,15 @@ def get_schedule(rows,fname,lname):
         if "Off" in time.get_text():
           continue
         data["agent"]=f"{fname} {lname}"
-        data["start_time"]=time_[0]
-        data["end_time"]=time_[1]
+        data["start_time"]=valid_time(time_[0].strip())
+        data["end_time"]=valid_time(time_[1].strip())
 
 
       for s_event,e_time in zip(shift_events,event_times):
 
         data.setdefault("events",[])
 
-        data["events"].append({s_event.get_text().strip():e_time.get_text().strip().split("-")[0]})
+        data["events"].append({s_event.get_text().strip():valid_time(e_time.get_text().split("-")[0].strip())})
 
     if data:
       schedule.append(data)

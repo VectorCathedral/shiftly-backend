@@ -6,7 +6,7 @@ load_dotenv()
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="localhost",
+        host="192.168.10.206",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
@@ -15,13 +15,13 @@ class Database:
     self.cursor=self.conn.cursor()
 
 
-    def get_or_add_agent(self,email:str,agent_name:str):
+  def get_or_add_agent(self,email:str,fullname:str):
       self.cursor.execute(
           '''
         SELECT * FROM agents WHERE
-        email = %s and fullname =%s
+        email = %s and fullname = %s;
           ''',
-          (email,agent_name)
+          (email,fullname)
       )
 
       agent=self.cursor.fetchone()
@@ -34,8 +34,9 @@ class Database:
             INSERT INTO agents(email,fullname)
             VALUES
             (%s,%s)
+            RETURNING agent_id;
             ''',
-            (email,agent_name)
+            (email,fullname)
         )
       agent_id=self.cursor.fetchone()[0]
       self.conn.commit()
@@ -43,6 +44,42 @@ class Database:
       return agent_id
 
 
+  def populate_shifts(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
+     self.cursor.execute(
+        '''
+        INSERT INTO shifts(agent_id,shift_date,clock_in,clock_out)
+        VALUES
+        (%s,%s,%s,%s)
+        ON CONFLICT (agent_id,shift_date) 
+        DO UPDATE SET
+          clock_in = EXCLUDED.clock_in,
+          clock_out = EXCLUDED.clock_out
+        RETURNING shift_id;
+        ''',
+        (agent_id,shift_date,clock_in,clock_out)
+ 
+     )
+     row=self.cursor.fetchone()
+     self.conn.commit()
+     return row[0] if row else None
 
+
+  def populate_events(self,shift_id:str,event:str,event_time:str):
+     self.cursor.execute(
+        '''
+          INSERT INTO events (shift_id,event,event_time)
+          VALUES
+          (%s,%s,%s);
+        ''',
+        (shift_id,event,event_time)
+     )
+
+     self.conn.commit()
+     
+
+
+  def close(self):
+       self.cursor.close()
+       self.conn.close()
 
 
