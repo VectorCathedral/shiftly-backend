@@ -1,7 +1,7 @@
 import os
 import psycopg
 from dotenv import load_env
-load_env()
+load_dotenv()
 
 class Database:
   def __init__(self) -> None:
