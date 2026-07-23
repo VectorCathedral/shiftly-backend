@@ -9,7 +9,7 @@ class Database:
         host="localhost",
         dbname="shiftly",
         user="frame",
-        password=os.get_env("db_pwd"),
+        password=os.getenv("db_pwd"),
         port=5432
     )
     self.cursor=self.conn.cursor()
