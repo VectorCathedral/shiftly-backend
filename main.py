@@ -4,7 +4,7 @@ from database import Database
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI,UploadFile,File,Form
 origins = [
-    "http://16.28.28.246:8080",
+    "http://13.245.28.212:8080",
     "http://localhost:8080",
     "http://localhost:5173", 
 ]
