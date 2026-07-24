@@ -3,3 +3,4 @@ psycopg
 dotenv
 fastapi
 uvicorn
+python-multipart
