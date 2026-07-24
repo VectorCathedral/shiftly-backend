@@ -3,11 +3,15 @@ from functions import html_parser
 from database import Database
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI,UploadFile,File,Form
-
+origins = [
+    "http://16.28.28.246:8080",
+    "http://localhost:8080",
+    "http://localhost:5173", 
+]
 app=FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
