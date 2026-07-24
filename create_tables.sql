@@ -17,5 +17,6 @@ CREATE TABLE events (
     event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     shift_id INT NOT NULL REFERENCES shifts(shift_id) ON DELETE CASCADE,
     event VARCHAR(50) NOT NULL,
-    event_time TIME NOT NULL
+    event_time TIME NOT NULL,
+    UNIQUE (shift_id,event_time)
 );
