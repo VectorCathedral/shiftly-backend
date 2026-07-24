@@ -1,0 +1,21 @@
+CREATE TABLE agents (
+    agent_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    fullname VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE shifts (
+    shift_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    agent_id BIGINT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
+    shift_date DATE NOT NULL,
+    clock_in TIME NOT NULL,
+    clock_out TIME NOT NULL,
+    UNIQUE (shift_id,shift_date)
+);
+
+CREATE TABLE events (
+    event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    shift_id INT NOT NULL REFERENCES shifts(shift_id) ON DELETE CASCADE,
+    event VARCHAR(50) NOT NULL,
+    event_time TIME NOT NULL
+);
