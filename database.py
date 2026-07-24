@@ -6,7 +6,7 @@ load_dotenv()
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="192.168.10.206",
+        host="localhost",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
