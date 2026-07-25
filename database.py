@@ -39,7 +39,7 @@ class Database:
             (email,fullname)
         )
       agent_id=self.cursor.fetchone()[0]
-      #self.conn.commit()
+      self.conn.commit()
 
       return agent_id
 
@@ -57,7 +57,7 @@ class Database:
  
      )
      row=self.cursor.fetchone()
-     #self.conn.commit()
+     self.conn.commit()
      return row[0] if row else None
 
 
@@ -71,7 +71,7 @@ class Database:
         ''',
         (shift_id,event,event_time)
      )
-     
+     self.conn.commit()
 
 
   def close(self):
