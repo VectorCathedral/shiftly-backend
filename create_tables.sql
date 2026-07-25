@@ -10,7 +10,7 @@ CREATE TABLE shifts (
     shift_date DATE NOT NULL,
     clock_in TIME NOT NULL,
     clock_out TIME NOT NULL,
-    UNIQUE (shift_id,shift_date)
+    UNIQUE (agent_id,shift_date)
 );
 
 CREATE TABLE events (

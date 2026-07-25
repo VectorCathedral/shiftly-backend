@@ -39,14 +39,14 @@ async def upload(file: UploadFile=File(...),
                            shift["start_time"],
                            shift["end_time"]
         )
-    #     for event in shift["events"]:
-    #         event_,time=next(iter(event.items()))
-    #         db.populate_events(shift_id,event_,time)
+        for event in shift["events"]:
+            event_,time=next(iter(event.items()))
+            db.populate_events(shift_id,event_,time)
             
         
 
 
-
+    db.commit()
     db.close()               
     return {
         "agent_id":agent_id,

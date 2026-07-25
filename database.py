@@ -39,7 +39,7 @@ class Database:
             (email,fullname)
         )
       agent_id=self.cursor.fetchone()[0]
-      self.conn.commit()
+      #self.conn.commit()
 
       return agent_id
 
@@ -57,21 +57,20 @@ class Database:
  
      )
      row=self.cursor.fetchone()
-     self.conn.commit()
+     #self.conn.commit()
      return row[0] if row else None
 
 
-  # def populate_events(self,shift_id:str,event:str,event_time:str):
-  #    self.cursor.execute(
-  #       '''
-  #         INSERT INTO events (shift_id,event,event_time)
-  #         VALUES
-  #         (%s,%s,%s);
-  #       ''',
-  #       (shift_id,event,event_time)
-  #    )
-
-  #    self.conn.commit()
+  def populate_events(self,shift_id:str,event:str,event_time:str):
+     self.cursor.execute(
+        '''
+          INSERT INTO events (shift_id,event,event_time)
+          VALUES
+          (%s,%s,%s) 
+          ON CONFLICT (shift_id,event_time) DO NOTHING;
+        ''',
+        (shift_id,event,event_time)
+     )
      
 
 
@@ -79,4 +78,6 @@ class Database:
        self.cursor.close()
        self.conn.close()
 
+  def commit(self):
+     self.conn.commit()
 
