@@ -44,24 +44,21 @@ class Database:
       return agent_id
 
 
-  # def populate_shifts(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
-  #    self.cursor.execute(
-  #       '''
-  #       INSERT INTO shifts(agent_id,shift_date,clock_in,clock_out)
-  #       VALUES
-  #       (%s,%s,%s,%s)
-  #       ON CONFLICT (agent_id,shift_date) 
-  #       DO UPDATE SET
-  #         clock_in = EXCLUDED.clock_in,
-  #         clock_out = EXCLUDED.clock_out
-  #       RETURNING shift_id;
-  #       ''',
-  #       (agent_id,shift_date,clock_in,clock_out)
+  def populate_shifts(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
+     self.cursor.execute(
+        '''
+        INSERT INTO shifts(agent_id,shift_date,clock_in,clock_out)
+        VALUES
+        (%s,%s,%s,%s)
+        ON CONFLICT (agent_id,shift_date) Do NOTHING
+        RETURNING shift_id;
+        ''',
+        (agent_id,shift_date,clock_in,clock_out)
  
-  #    )
-  #    row=self.cursor.fetchone()
-  #    self.conn.commit()
-  #    return row[0] if row else None
+     )
+     row=self.cursor.fetchone()
+     self.conn.commit()
+     return row[0] if row else None
 
 
   # def populate_events(self,shift_id:str,event:str,event_time:str):
