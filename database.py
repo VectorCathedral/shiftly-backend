@@ -50,7 +50,7 @@ class Database:
         INSERT INTO shifts(agent_id,shift_date,clock_in,clock_out)
         VALUES
         (%s,%s,%s,%s)
-        ON CONFLICT (agent_id,shift_date) Do NOTHING
+        ON CONFLICT (agent_id,shift_date) DO NOTHING
         RETURNING shift_id;
         ''',
         (agent_id,shift_date,clock_in,clock_out)
@@ -58,7 +58,18 @@ class Database:
      )
      row=self.cursor.fetchone()
      self.conn.commit()
-     return row[0] if row else None
+     if row:
+      return row[0] if row else None
+     
+     self.cursor.execute( '''
+     SELECT shift_id FROM shifts 
+     WHERE agent_id =%s 
+     AND shift_date =%s
+     ''',
+    (agent_id,shift_date)
+     )
+
+     return self.cursor.fetchone()[0]
 
 
   def populate_events(self,shift_id:str,event:str,event_time:str):
