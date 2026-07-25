@@ -78,8 +78,8 @@ class Database:
      
 
 
-  # def close(self):
-  #      self.cursor.close()
-  #      self.conn.close()
+  def close(self):
+       self.cursor.close()
+       self.conn.close()
 
 
