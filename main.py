@@ -30,18 +30,18 @@ async def upload(file: UploadFile=File(...),
 
     agent_id=db.get_or_add_agent(email,fullname)
 
-    for shift in schedule:
-        if "start_time" not in shift or "end_time" not in shift:
-            continue
+    # for shift in schedule:
+    #     if "start_time" not in shift or "end_time" not in shift:
+    #         continue
 
-        shift_id=db.populate_shifts(agent_id,
-                           shift["date"],
-                           shift["start_time"],
-                           shift["end_time"]
-        )
-        for event in shift["events"]:
-            event_,time=next(iter(event.items()))
-            db.populate_events(shift_id,event_,time)
+    #     shift_id=db.populate_shifts(agent_id,
+    #                        shift["date"],
+    #                        shift["start_time"],
+    #                        shift["end_time"]
+    #     )
+    #     for event in shift["events"]:
+    #         event_,time=next(iter(event.items()))
+    #         db.populate_events(shift_id,event_,time)
             
         
 
