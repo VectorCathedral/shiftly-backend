@@ -59,7 +59,16 @@ async def upload(file: UploadFile=File(...),
 
 
 
+@app.get("/shifts")
+async def fetchSchedules():
+    db=Database()
 
+    all_shifts=db.get_schedules()
+
+    return{
+        "ok":True,
+        "shifts":all_shifts
+    }
     
 
 if __name__ == "__main__":

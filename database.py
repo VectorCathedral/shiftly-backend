@@ -1,16 +1,20 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+from psycopg.rows import dict_row
+from datetime import datetime as dt
+
 load_dotenv()
 
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="localhost",
+        host="16.28.2.192",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
-        port=5432
+        port=5432,
+        row_factory=dict_row
     )
     self.cursor=self.conn.cursor()
 
@@ -84,6 +88,36 @@ class Database:
         (shift_id,event,event_time)
      )
      self.conn.commit()
+
+
+
+
+  def get_schedules(self,from_=None,to=None):
+     self.cursor.execute(
+        '''
+         SELECT * FROM shifts
+         WHERE shift_date 
+         BETWEEN %s
+         AND  %s ;
+
+        ''',
+        (from_,to)
+     )
+     schedule=self.cursor.fetchall()
+
+     if schedule :
+        return schedule
+     self.cursor.execute(
+        '''
+        SELECT * FROM shifts
+                 WHERE 
+                 EXTRACT(MONTH FROM shift_date)=%s
+                 AND EXTRACT (YEAR FROM shift_date)= %s;
+        ''',
+        (dt.now().month,dt.now().year)
+     )
+     return self.cursor.fetchall()
+     
 
 
   def close(self):
