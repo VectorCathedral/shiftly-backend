@@ -9,7 +9,7 @@ load_dotenv()
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="localhost",
+        host="16.28.2.192",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
@@ -31,7 +31,7 @@ class Database:
       agent=self.cursor.fetchone()
 
       if agent:
-        return agent[0]
+        return agent["agent_id"]
       
       self.cursor.execute(
             '''
@@ -43,7 +43,8 @@ class Database:
             ''',
             (email,fullname)
         )
-      agent_id=self.cursor.fetchone()[0]
+      row=self.cursor.fetchone()
+      agent_id=row["agent_id"]
       self.conn.commit()
 
       return agent_id
@@ -64,7 +65,7 @@ class Database:
      row=self.cursor.fetchone()
      self.conn.commit()
      if row:
-      return row[0] if row else None
+      return ["shift_id"] if row else None
      
      self.cursor.execute( '''
      SELECT shift_id FROM shifts 
@@ -74,7 +75,7 @@ class Database:
     (agent_id,shift_date)
      )
 
-     return self.cursor.fetchone()[0]
+     return self.cursor.fetchone()["shift_id"]
 
 
   def populate_events(self,shift_id:str,event:str,event_time:str):
@@ -92,16 +93,16 @@ class Database:
 
 
 
-  def get_schedules(self,from_=None,to=None):
+  def get_schedules(self,agent_id:int,from_=None,to=None):
      self.cursor.execute(
         '''
          SELECT * FROM shifts
          WHERE shift_date 
          BETWEEN %s
-         AND  %s ;
+         AND  %s  AND agent_id =%s;
 
         ''',
-        (from_,to)
+        (from_,to,agent_id)
      )
      schedule=self.cursor.fetchall()
 
@@ -112,11 +113,26 @@ class Database:
         SELECT * FROM shifts
                  WHERE 
                  EXTRACT(MONTH FROM shift_date)=%s
-                 AND EXTRACT (YEAR FROM shift_date)= %s;
+                 AND EXTRACT (YEAR FROM shift_date)= %s
+                 AND agent_id = %s;
         ''',
-        (dt.now().month,dt.now().year)
+        (dt.now().month,dt.now().year,agent_id)
      )
      return self.cursor.fetchall()
+
+
+  def agent_id(self,email):
+     self.cursor.execute(
+        '''
+         SELECT agent_id FROM agents 
+         WHERE email= %s
+         ''',
+         (email,)
+     )
+
+     agent_id=self.cursor.fetchone()
+     return agent_id["agent_id"]
+     
      
 
 

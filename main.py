@@ -60,10 +60,12 @@ async def upload(file: UploadFile=File(...),
 
 
 @app.get("/shifts")
-async def fetchSchedules():
+async def fetchSchedules(email):
     db=Database()
+    agent_id=db.agent_id(email=email)
 
-    all_shifts=db.get_schedules()
+    all_shifts=db.get_schedules(agent_id=agent_id)
+    db.close()
 
     return{
         "ok":True,
