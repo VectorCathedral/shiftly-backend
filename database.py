@@ -34,6 +34,7 @@ class Database:
             INSERT INTO agents(email,fullname)
             VALUES
             (%s,%s)
+            ON CONFLICT(email) DO NOTHING
             RETURNING agent_id;
             ''',
             (email,fullname)
