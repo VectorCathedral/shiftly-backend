@@ -1,13 +1,12 @@
 import os
 import psycopg
 from dotenv import load_dotenv
-from datetime import datetime as dt
 load_dotenv()
 
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="16.28.2.192",
+        host="localhost",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
@@ -86,42 +85,6 @@ class Database:
      self.conn.commit()
 
 
-  def get_employees(self):
-    self.cursor.execute(
-      '''
-    SELECT * FROM agents;
-      '''
-    )
-    return self.cursor.fetchmany()
-
-  def get_shifts(self,from_=None,to=None):
-    self.cursor.execute(
-      '''
-      SELECT * FROM shifts 
-      WHERE shift_date BETWEEN
-      %s AND %s;
-      ''',
-      (from_,to)
-    )
-    shifts=self.cursor.fetchmany()
-    if shifts:
-      return shifts
-
-    self.cursor.execute(
-    '''
-      SELECT * FROM shifts
-      WHERE EXTRACT(MONTH FROM shfift_date)= %s
-      AND EXTRACT (YEAR FROM shift_date) = %s
-    ''',
-    (dt.now().month,dt.now().year)
-    )
-
-    return self.cursor.fetchmany()
-  
-      
-      
-
-
   def close(self):
        self.cursor.close()
        self.conn.close()
@@ -129,3 +92,10 @@ class Database:
   def commit(self):
      self.conn.commit()
 
+  def select_test(self,querry):
+     self.cursor.execute(
+
+      querry
+     )
+     
+     return self.cursor.fetchall()
