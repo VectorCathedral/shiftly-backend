@@ -85,6 +85,37 @@ class Database:
      self.conn.commit()
 
 
+  def get_employees(self):
+    self.cursor.execute(
+      '''
+    SELECT * FROM agents;
+      '''
+    )
+    return self.cursor.fetchmany()
+
+  def get_shifts(self,from_=None,to=None):
+    self.cursor.execute(
+      '''
+      SELECT * FROM shifts 
+      WHERE shift_date BETWEEN
+      %s AND %s;
+      ''',
+      (from_,to)
+    )
+    shifts=self.cursor.fetchmany()
+    if shifts:
+      return shifts
+
+    self.cursor.execute(
+    '''
+      SELECT * FROM SHIFTS
+    ''',
+    ()
+  
+      
+      
+
+
   def close(self):
        self.cursor.close()
        self.conn.close()
