@@ -59,7 +59,7 @@ async def upload(file: UploadFile=File(...),
 
 
 
-@app.get("/shifts")
+@app.get("/myshifts")
 async def fetchSchedules(email):
     db=Database()
     agent_id=db.agent_id(email=email)
