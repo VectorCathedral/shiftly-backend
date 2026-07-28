@@ -9,7 +9,7 @@ load_dotenv()
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="localhost",
+        host="16.28.2.192",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
@@ -133,7 +133,13 @@ class Database:
      agent_id=self.cursor.fetchone()
      return agent_id["agent_id"]
      
-     
+
+
+  def team(self):
+        self.cursor.execute('''
+        SELECT * FROM agents  ORDER BY fullname     
+        ''')
+        return self.cursor.fetchall()
 
 
   def close(self):

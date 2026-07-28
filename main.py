@@ -71,6 +71,32 @@ async def fetchSchedules(email):
         "ok":True,
         "shifts":all_shifts
     }
+
+
+@app.get("/team/{agent_id}/shifts")
+async def employee_shifts(agent_id: int):
+    db = Database()
+
+    try:
+        shifts = db.get_schedules(agent_id)
+        return {
+            "ok": True,
+            "shifts": shifts
+        }
+    finally:
+        db.close()
+
+
+
+@app.get("/team")
+async def team():
+    db=Database()
+    employees=db.team()
+    db.close()
+    return{
+        "ok":True,
+        "team":employees
+    }
     
 
 if __name__ == "__main__":
