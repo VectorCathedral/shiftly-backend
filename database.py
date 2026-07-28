@@ -9,7 +9,7 @@ load_dotenv()
 class Database:
   def __init__(self) -> None:
     self.conn=psycopg.connect(
-        host="localhost",
+        host="16.28.2.192",
         dbname="shiftly",
         user="frame",
         password=os.getenv("db_pwd"),
@@ -65,7 +65,7 @@ class Database:
      row=self.cursor.fetchone()
      self.conn.commit()
      if row:
-      return ["shift_id"] if row else None
+      return row["shift_id"] if row else None
      
      self.cursor.execute( '''
      SELECT shift_id FROM shifts 
