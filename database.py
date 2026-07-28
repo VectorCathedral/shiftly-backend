@@ -1,6 +1,7 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+from datetime import datetime as dt
 load_dotenv()
 
 class Database:
@@ -108,9 +109,14 @@ class Database:
 
     self.cursor.execute(
     '''
-      SELECT * FROM SHIFTS
+      SELECT * FROM shifts
+      WHERE EXTRACT(MONTH FROM shfift_date)= %s
+      AND EXTRACT (YEAR FROM shift_date) = %s
     ''',
-    ()
+    (dt.now().month,dt.now().year)
+    )
+
+    return self.cursor.fetchmany()
   
       
       
