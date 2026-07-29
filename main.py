@@ -1,13 +1,17 @@
 import uvicorn
 from functions import html_parser
+from database import Database
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI,UploadFile,File,Form
-
+origins = [
+    "http://16.28.2.192:8080",
+    "http://localhost:8080",
+    "http://localhost:5173", 
+]
 app=FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -17,22 +21,104 @@ app.add_middleware(
 
 async def upload(file: UploadFile=File(...),
                  email:str = Form(...)):
-    html=(await file.read()).decode("utf-8")
+    db=Database()
+    try:
+      html=(await file.read()).decode("utf-8")
 
-    schedule=html_parser (html)
+      schedule=html_parser (html)
+
+      fullname=schedule[0].get ("agent","")
+
+      agent_id=db.get_or_add_agent(email,fullname)
+
+      for shift in schedule:
+          if "start_time" not in shift or "end_time" not in shift:
+              continue
+
+          shift_id=db.populate_shifts(agent_id,
+                            shift["date"],
+                            shift["start_time"],
+                            shift["end_time"]
+          )
+          for event in shift["events"]:
+              event_,time=next(iter(event.items()))
+              db.populate_events(shift_id,event_,time)
+              
+          
+
+
+          db.commit()
+      return {
+          "agent_id":agent_id,
+          "ok":True,
+          "email":email,
+          "schedule":schedule
+          
+      }
+
+    except Exception as e:
+        {
+          "status":500,
+          "message":f"Internal Server error"
+      }
+
+      finally:
+
+      db.close()               
+    
 
 
 
 
+@app.get("/myshifts")
+async def fetchSchedules(email):
+    db=Database()
+    agent_id=db.agent_id(email=email)
 
-                     
-    return {
+    all_shifts=db.get_schedules(agent_id=agent_id)
+    db.close()
+
+    return{
         "ok":True,
-        "email":email,
-        "schedule":schedule
-        
+        "shifts":all_shifts
     }
 
 
+@app.get("/team/{agent_id}/shifts")
+async def employee_shifts(agent_id: int):
+    db = Database()
+
+    try:
+        shifts = db.get_schedules(agent_id)
+        return {
+            "ok": True,
+            "shifts": shifts
+        }
+    finally:
+        db.close()
+
+
+
+@app.get("/team")
+async def team():
+    db=Database()
+    try:
+      employees=db.team()
+
+      return{
+        "ok":True,
+        "team":employees
+    }
+
+    except Exception as e:
+        {
+          "status":500,
+          "message":f"Internal Server error"
+      }
+    finally:
+      db.close()
+    
+    
+
 if __name__ == "__main__":
-    uvicorn.run (app,host="localhost",port=8000)
+    uvicorn.run (app,host="0.0.0.0",port=8000)
