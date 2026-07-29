@@ -19,19 +19,24 @@ class Database:
     self.cursor=self.conn.cursor()
 
 
-  def get_or_add_agent(self,email:str,fullname:str):
-      self.cursor.execute(
-          '''
-        SELECT * FROM agents WHERE
-        email = %s and fullname = %s;
-          ''',
-          (email,fullname)
-      )
+  def get_id(self,email):
+     self.cursor.execute(
+        '''
+         SELECT agent_id FROM agents 
+         WHERE email= %s
+         ''',
+         (email,)
+     )
 
-      agent=self.cursor.fetchone()
+     agent_id=self.cursor.fetchone()
 
-      if agent:
-        return agent["agent_id"]
+     if agent_id is None:
+        return None
+     
+     return agent_id["agent_id"]
+  
+  
+  def add_agent(self,email:str,fullname:str):
       
       self.cursor.execute(
             '''
@@ -43,11 +48,7 @@ class Database:
             ''',
             (email,fullname)
         )
-      row=self.cursor.fetchone()
-      agent_id=row["agent_id"]
-      self.conn.commit()
-
-      return agent_id
+     
 
 
   def populate_shifts(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
@@ -121,17 +122,7 @@ class Database:
      return self.cursor.fetchall()
 
 
-  def agent_id(self,email):
-     self.cursor.execute(
-        '''
-         SELECT agent_id FROM agents 
-         WHERE email= %s
-         ''',
-         (email,)
-     )
 
-     agent_id=self.cursor.fetchone()
-     return agent_id["agent_id"]
      
 
 
@@ -156,3 +147,4 @@ class Database:
      )
      
      return self.cursor.fetchall()
+

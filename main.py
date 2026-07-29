@@ -22,13 +22,26 @@ app.add_middleware(
 async def upload(file: UploadFile=File(...),
                  email:str = Form(...)):
     db=Database()
+    email=email.lower()
     html=(await file.read()).decode("utf-8")
 
-    schedule=html_parser (html)
+    try:
+        schedule=html_parser(html)
+        
+        fullname=schedule[0].get("agent","")
+    except Exception as e:
+        print(e)
 
-    fullname=schedule[0].get ("agent","")
+    try:
 
-    agent_id=db.get_or_add_agent(email,fullname)
+        agent_id=db.get_id(email)
+
+        if agent_id is None:
+            db.add_agent(email,fullname)
+            agent_id=db.get_id(email)
+
+    except:
+        pass
 
     for shift in schedule:
         if "start_time" not in shift or "end_time" not in shift:
@@ -62,7 +75,7 @@ async def upload(file: UploadFile=File(...),
 @app.get("/myshifts")
 async def fetchSchedules(email):
     db=Database()
-    agent_id=db.agent_id(email=email)
+    agent_id=db.get_id(email=email)
 
     all_shifts=db.get_schedules(agent_id=agent_id)
     db.close()
