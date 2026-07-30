@@ -67,7 +67,7 @@ class Database:
      self.conn.commit()
 
 
-  def get_shift_id(self,agent_id:int,shift_date:str)
+  def get_shift_id(self,agent_id:int,shift_date:str):
 
      self.cursor.execute( '''
      SELECT shift_id FROM shifts
