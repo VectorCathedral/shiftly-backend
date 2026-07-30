@@ -47,14 +47,22 @@ async def upload(file: UploadFile=File(...),
         if "start_time" not in shift or "end_time" not in shift:
             continue
 
-        shift_id=db.populate_shifts(agent_id,
+        try:
+          db.populate_shifts(agent_id,
                            shift["date"],
                            shift["start_time"],
-                           shift["end_time"]
-        )
-        for event in shift["events"]:
-            event_,time=next(iter(event.items()))
-            db.populate_events(shift_id,event_,time)
+                           shift["end_time"])
+        except:
+          pass
+
+
+        try:
+          shift_id=get_shift_id(agent_id,shift["date"])
+          for event in shift["events"]:
+              event_,time=next(iter(event.items()))
+              db.populate_events(shift_id,event_,time)
+        except:
+          pass
             
         
 
