@@ -22,7 +22,7 @@ class Database:
   def get_id(self,email):
      self.cursor.execute(
         '''
-         SELECT agent_id FROM agents 
+         SELECT agent_id FROM agents
          WHERE email= %s
          ''',
          (email,)
@@ -32,12 +32,12 @@ class Database:
 
      if agent_id is None:
         return None
-     
+
      return agent_id["agent_id"]
-  
-  
+
+
   def add_agent(self,email:str,fullname:str):
-      
+
       self.cursor.execute(
             '''
             INSERT INTO agents(email,fullname)
@@ -48,35 +48,41 @@ class Database:
             ''',
             (email,fullname)
         )
-     
 
 
-  def populate_shifts(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
+
+  def add_shift(self,agent_id:str,shift_date:str,clock_in:str,clock_out:str):
      self.cursor.execute(
         '''
         INSERT INTO shifts(agent_id,shift_date,clock_in,clock_out)
         VALUES
         (%s,%s,%s,%s)
         ON CONFLICT (agent_id,shift_date) DO NOTHING
-        RETURNING shift_id;
         ''',
         (agent_id,shift_date,clock_in,clock_out)
- 
+
      )
-     row=self.cursor.fetchone()
+
+
      self.conn.commit()
-     if row:
-      return row["shift_id"] if row else None
-     
+
+
+  def get_shift_id(self,agent_id:int,shift_date:str)
+
      self.cursor.execute( '''
-     SELECT shift_id FROM shifts 
-     WHERE agent_id =%s 
+     SELECT shift_id FROM shifts
+     WHERE agent_id =%s
      AND shift_date =%s
      ''',
     (agent_id,shift_date)
+
      )
 
-     return self.cursor.fetchone()["shift_id"]
+    shift_id=self.cursor.fetchone()
+    if shift_id is None:
+      return None
+
+    return shift_id["shift_id"]
 
 
   def populate_events(self,shift_id:str,event:str,event_time:str):
@@ -84,7 +90,7 @@ class Database:
         '''
           INSERT INTO events (shift_id,event,event_time)
           VALUES
-          (%s,%s,%s) 
+          (%s,%s,%s)
           ON CONFLICT (shift_id,event_time) DO NOTHING;
         ''',
         (shift_id,event,event_time)
@@ -98,7 +104,7 @@ class Database:
      self.cursor.execute(
         '''
          SELECT * FROM shifts
-         WHERE shift_date 
+         WHERE shift_date
          BETWEEN %s
          AND  %s  AND agent_id =%s;
 
@@ -112,7 +118,7 @@ class Database:
      self.cursor.execute(
         '''
         SELECT * FROM shifts
-                 WHERE 
+                 WHERE
                  EXTRACT(MONTH FROM shift_date)=%s
                  AND EXTRACT (YEAR FROM shift_date)= %s
                  AND agent_id = %s;
@@ -123,12 +129,12 @@ class Database:
 
 
 
-     
+
 
 
   def team(self):
         self.cursor.execute('''
-        SELECT * FROM agents  ORDER BY fullname     
+        SELECT * FROM agents  ORDER BY fullname
         ''')
         return self.cursor.fetchall()
 
@@ -145,6 +151,5 @@ class Database:
 
       querry
      )
-     
-     return self.cursor.fetchall()
 
+     return self.cursor.fetchall()
