@@ -2,13 +2,16 @@ import uvicorn
 from functions import html_parser
 from database import Database
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI,UploadFile,File,Form
+from fastapi import FastAPI, UploadFile, File, Form
+
 origins = [
     "http://16.28.2.192:8080",
     "http://localhost:8080",
-    "http://localhost:5173", 
+    "http://localhost:5173",
 ]
-app=FastAPI()
+
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -17,28 +20,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/upload")
 
-async def upload(file: UploadFile=File(...),
-                 email:str = Form(...)):
-    db=Database()
-    email=email.lower()
-    html=(await file.read()).decode("utf-8")
+@app.post("/upload")
+async def upload(
+    file: UploadFile = File(...),
+    email: str = Form(...),
+):
+    db = Database()
+    email = email.lower()
+    html = (await file.read()).decode("utf-8")
 
     try:
-        schedule=html_parser(html)
-        
-        fullname=schedule[0].get("agent","")
+        schedule = html_parser(html)
+        fullname = schedule[0].get("agent", "")
     except Exception as e:
         print(e)
 
     try:
-
-        agent_id=db.get_id(email)
+        agent_id = db.get_id(email)
 
         if agent_id is None:
-            db.add_agent(email,fullname)
-            agent_id=db.get_id(email)
+            db.add_agent(email, fullname)
+            agent_id = db.get_id(email)
 
     except:
         pass
@@ -48,49 +51,45 @@ async def upload(file: UploadFile=File(...),
             continue
 
         try:
-          db.populate_shifts(agent_id,
-                           shift["date"],
-                           shift["start_time"],
-                           shift["end_time"])
+            db.populate_shifts(
+                agent_id,
+                shift["date"],
+                shift["start_time"],
+                shift["end_time"],
+            )
         except:
-          pass
-
+            pass
 
         try:
-          shift_id=get_shift_id(agent_id,shift["date"])
-          for event in shift["events"]:
-              event_,time=next(iter(event.items()))
-              db.populate_events(shift_id,event_,time)
+            shift_id = get_shift_id(agent_id, shift["date"])
+            for event in shift["events"]:
+                event_, time = next(iter(event.items()))
+                db.populate_events(shift_id, event_, time)
         except:
-          pass
-            
-        
-
+            pass
 
     db.commit()
-    db.close()               
+    db.close()
+
     return {
-        "agent_id":agent_id,
-        "ok":True,
-        "email":email,
-        "schedule":schedule
-        
+        "agent_id": agent_id,
+        "ok": True,
+        "email": email,
+        "schedule": schedule,
     }
-
-
 
 
 @app.get("/myshifts")
 async def fetchSchedules(email):
-    db=Database()
-    agent_id=db.get_id(email=email)
+    db = Database()
+    agent_id = db.get_id(email=email)
 
-    all_shifts=db.get_schedules(agent_id=agent_id)
+    all_shifts = db.get_schedules(agent_id=agent_id)
     db.close()
 
-    return{
-        "ok":True,
-        "shifts":all_shifts
+    return {
+        "ok": True,
+        "shifts": all_shifts,
     }
 
 
@@ -102,23 +101,23 @@ async def employee_shifts(agent_id: int):
         shifts = db.get_schedules(agent_id)
         return {
             "ok": True,
-            "shifts": shifts
+            "shifts": shifts,
         }
     finally:
         db.close()
 
 
-
 @app.get("/team")
 async def team():
-    db=Database()
-    employees=db.team()
+    db = Database()
+    employees = db.team()
     db.close()
-    return{
-        "ok":True,
-        "team":employees
+
+    return {
+        "ok": True,
+        "team": employees,
     }
-    
+
 
 if __name__ == "__main__":
-    uvicorn.run (app,host="0.0.0.0",port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
