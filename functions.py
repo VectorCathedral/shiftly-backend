@@ -63,12 +63,16 @@ def get_schedule(rows,fname,lname):
 
       #appending time and agent fullname to dict
       for time in shift_times:
-        time_=time.get_text().split("-")
         if "Off" in time.get_text():
-          continue
-        data["agent"]=f"{fname} {lname}"
-        data["start_time"]=valid_time(time_[0].strip())
-        data["end_time"]=valid_time(time_[1].strip())
+          data["agent"]=f"{fname} {lname}"
+          data["start_time"]=None
+          data["end_time"]=None
+          
+        else:
+          time_=time.get_text().split("-")
+          data["agent"]=f"{fname} {lname}"
+          data["start_time"]=valid_time(time_[0].strip())
+          data["end_time"]=valid_time(time_[1].strip())
 
 
       for s_event,e_time in zip(shift_events,event_times):

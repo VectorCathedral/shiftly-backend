@@ -2,3 +2,4 @@
 .env* .local
 test.ipynb
 myshcedule.html
+__pycache__
