@@ -51,7 +51,7 @@ async def upload(
             continue
 
         try:
-            db.populate_shifts(
+            db.add_shift(
                 agent_id,
                 shift["date"],
                 shift["start_time"],
@@ -61,7 +61,7 @@ async def upload(
             pass
 
         try:
-            shift_id = get_shift_id(agent_id, shift["date"])
+            shift_id = db.get_shift_id(agent_id, shift["date"])
             for event in shift["events"]:
                 event_, time = next(iter(event.items()))
                 db.populate_events(shift_id, event_, time)
